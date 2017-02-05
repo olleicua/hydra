@@ -1,0 +1,22 @@
+body {
+  background-color: #ffad31;
+}
+
+.head {
+  background-color: #ff0aaf;
+  -webkit-border-radius: 100%;
+  -moz-border-radius: 100%;
+  border-radius: 100%;
+  position: fixed;
+  z-index: 2;
+  filter: blur(1.5px);
+}
+
+.neck {
+  background-color: #ff3d01;
+  position: fixed;
+  height: 3px;
+  z-index: 1;
+  transform-origin: left;
+  filter: blur(1px);
+}
