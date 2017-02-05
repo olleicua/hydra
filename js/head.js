@@ -1,11 +1,14 @@
 window.Head = {
   init: function(parent) {
+    var that = this;
+
     this.parent = parent;
     this.children = [];
     if (parent) this.parent.children.push(this);
 
     this.head = document.createElement('div');
     this.head.className = 'head';
+    this.head.addEventListener('click', function() { that.chop(); });
     if (parent) {
       this.neck = document.createElement('div');
       this.neck.className = 'neck';
@@ -81,24 +84,14 @@ window.Head = {
       var initialTheta = 0;
     }
 
-    console.log(
-      '\n',
-      '\nparent', this.head,
-      '\ninitialTheta', initialTheta
-    )
     for (var i = 0; i < this.children.length; i++) {
-      console.log(
-        '\nchild', this.children[i].head,
-        '\ni', i,
-        '\nangle', angle,
-        '\n(angle * i) + initialTheta', (angle * i) + initialTheta
-      );
       this.children[i].position(
         Math.polarToCartesian(
           [distance, (angle * (i + 1)) + initialTheta]
           , this.position()
         )
       );
+      this.children[i].balanceChildren();
     }
   },
 
@@ -107,11 +100,39 @@ window.Head = {
   },
 
   randomSpawn: function() {
-    if (Math.random() < Math.pow(0.7, this.depth())) {
+    if (Math.random() < Math.pow(0.45, this.depth())) {
       var childCount = Math.floor(Math.random() * 5) + 1;
       for (var i = 0; i < childCount; i++) Head.build(this)
       this.balanceChildren();
       for (var i = 0; i < childCount; i++) this.children[i].randomSpawn();
+    }
+  },
+
+  duplicate: function(parent) {
+    var copy = Head.build(parent);
+
+    for (var i = 0; i < this.children.length; i++) {
+      this.children[i].duplicate(copy);
+    }
+  },
+
+  chop: function() {
+    if (this.children.length === 0) {
+      this.head.remove();
+
+      if (this.parent) {
+        this.neck.remove();
+
+        var index = this.parent.children.indexOf(this);
+        this.parent.children.splice(index, 1);
+        this.parent.balanceChildren();
+
+        if (this.parent.parent) {
+          this.parent.duplicate(this.parent.parent);
+          this.parent.duplicate(this.parent.parent);
+          this.parent.parent.balanceChildren();
+        }
+      }
     }
   }
 };
